@@ -25,6 +25,10 @@ private:
       const sensor_msgs::msg::Image::ConstSharedPtr &right_msg,
       cv::Mat &left_rectified,
       cv::Mat &right_rectified);
+  bool computeDisparitySGBM(
+    const cv::Mat &left_rect,
+    const cv::Mat &right_rect,
+    cv::Mat &disparity);
 
   message_filters::Subscriber<sensor_msgs::msg::Image> left_image_sub_;
   message_filters::Subscriber<sensor_msgs::msg::Image> right_image_sub_;
