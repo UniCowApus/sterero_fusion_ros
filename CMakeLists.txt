@@ -8,6 +8,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_geometry REQUIRED)
@@ -27,6 +28,7 @@ ament_target_dependencies(stereo_fusion_node
   message_filters
   cv_bridge
   image_geometry
+  visualization_msgs
 )
 
 target_link_libraries(stereo_fusion_node

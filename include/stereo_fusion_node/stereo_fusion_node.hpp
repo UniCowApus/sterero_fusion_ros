@@ -11,6 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include "visualization_msgs/msg/marker_array.hpp"
 
 struct Detection
 {
@@ -18,6 +19,14 @@ struct Detection
     float confidence;
     cv::Rect box;
 };
+
+struct Detection3D
+{
+    Detection det;
+    cv::Point3f position_cam;
+    float disparity;
+};
+
 
 
 class StereoFusionNode : public rclcpp::Node
@@ -41,7 +50,13 @@ private:
     cv::Mat &disparity);
   std::vector<Detection> detect(const cv::Mat& image, int input_width_ = 640, int input_height_ = 640, float conf_thresh_ = 0.4f, float nms_thresh_ = 0.5f); 
   void loadONNX();
+  bool estimateDepthFromDisparity(
+    const std::vector<Detection>& detections,
+    const cv::Mat& disparity,
+    std::vector<Detection3D>& out_detections_3d);
 
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr left_image_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   message_filters::Subscriber<sensor_msgs::msg::Image> left_image_sub_;
   message_filters::Subscriber<sensor_msgs::msg::Image> right_image_sub_;
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr left_info_sub_;
