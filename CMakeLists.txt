@@ -11,7 +11,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_geometry REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.14 REQUIRED)
 
 include_directories(
   include
@@ -35,6 +35,11 @@ target_link_libraries(stereo_fusion_node
 
 install(TARGETS stereo_fusion_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY models
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(DIRECTORY include/

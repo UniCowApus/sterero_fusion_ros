@@ -9,6 +9,16 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_geometry/pinhole_camera_model.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+struct Detection
+{
+    int class_id;
+    float confidence;
+    cv::Rect box;
+};
+
 
 class StereoFusionNode : public rclcpp::Node
 {
@@ -29,6 +39,8 @@ private:
     const cv::Mat &left_rect,
     const cv::Mat &right_rect,
     cv::Mat &disparity);
+  std::vector<Detection> detect(const cv::Mat& image, int input_width_ = 640, int input_height_ = 640, float conf_thresh_ = 0.4f, float nms_thresh_ = 0.5f); 
+  void loadONNX();
 
   message_filters::Subscriber<sensor_msgs::msg::Image> left_image_sub_;
   message_filters::Subscriber<sensor_msgs::msg::Image> right_image_sub_;
@@ -47,4 +59,6 @@ private:
 
   bool left_info_received_  = false;
   bool right_info_received_ = false;
+  cv::dnn::Net net_;
+
 };
