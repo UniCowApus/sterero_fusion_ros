@@ -15,6 +15,7 @@ Per object depth estimation from disparity
 
 Package Structure
 stereo_fusion_node
+
 ├── include/stereo_fusion_node/stereo_fusion_node.hpp
 
 ├── src/stereo_fusion_node.cpp
