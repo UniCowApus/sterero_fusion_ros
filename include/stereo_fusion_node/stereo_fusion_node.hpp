@@ -12,6 +12,7 @@
 #include <opencv2/dnn.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include "visualization_msgs/msg/marker_array.hpp"
+#include <sensor_msgs/msg/compressed_image.hpp>
 
 struct Detection
 {
@@ -38,10 +39,10 @@ private:
 
   void leftInfoCallback(const sensor_msgs::msg::CameraInfo::SharedPtr msg);
   void rightInfoCallback(const sensor_msgs::msg::CameraInfo::SharedPtr msg);
-  void stereoCallback(const sensor_msgs::msg::Image::ConstSharedPtr &left_msg,
-      const sensor_msgs::msg::Image::ConstSharedPtr &right_msg);
-  bool rectifyStereoPair(const sensor_msgs::msg::Image::ConstSharedPtr &left_msg,
-      const sensor_msgs::msg::Image::ConstSharedPtr &right_msg,
+  void stereoCallback(const sensor_msgs::msg::CompressedImage::ConstSharedPtr &left_msg,
+    const sensor_msgs::msg::CompressedImage::ConstSharedPtr &right_msg);
+  bool rectifyStereoPair(const sensor_msgs::msg::CompressedImage::ConstSharedPtr &left_msg,
+      const sensor_msgs::msg::CompressedImage::ConstSharedPtr &right_msg,
       cv::Mat &left_rectified,
       cv::Mat &right_rectified);
   bool computeDisparitySGBM(
@@ -57,15 +58,15 @@ private:
 
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr left_image_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-  message_filters::Subscriber<sensor_msgs::msg::Image> left_image_sub_;
-  message_filters::Subscriber<sensor_msgs::msg::Image> right_image_sub_;
+  message_filters::Subscriber<sensor_msgs::msg::CompressedImage> left_image_sub_;
+  message_filters::Subscriber<sensor_msgs::msg::CompressedImage> right_image_sub_;
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr left_info_sub_;
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr right_info_sub_;
   
   using SyncPolicy =
       message_filters::sync_policies::ApproximateTime<
-          sensor_msgs::msg::Image,
-          sensor_msgs::msg::Image>;
+          sensor_msgs::msg::CompressedImage,
+          sensor_msgs::msg::CompressedImage>;
   using Synchronizer = message_filters::Synchronizer<SyncPolicy>;
   std::shared_ptr<Synchronizer> sync_;
 

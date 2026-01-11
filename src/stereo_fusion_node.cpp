@@ -6,15 +6,15 @@ using std::placeholders::_2;
 StereoFusionNode::StereoFusionNode()
     : Node("stereo_fusion_node")
 {
-    left_image_sub_.subscribe(this, "/stereo/left/image_raw");
-    right_image_sub_.subscribe(this, "/stereo/right/image_raw");
+    left_image_sub_.subscribe(this, "/left/left_camera_node/image_raw/compressed");
+    right_image_sub_.subscribe(this, "/right/right_camera_node/image_raw/compressed");
 
     left_info_sub_ = create_subscription<sensor_msgs::msg::CameraInfo>(
-        "/stereo/left/camera_info", 10,
+        "/left/left_camera_node/camera_info", 10,
         std::bind(&StereoFusionNode::leftInfoCallback, this, _1));
 
     right_info_sub_ = create_subscription<sensor_msgs::msg::CameraInfo>(
-        "/stereo/right/camera_info", 10,
+        "/right/right_camera_node/camera_info", 10,
         std::bind(&StereoFusionNode::rightInfoCallback, this, _1));
 
     sync_ = std::make_shared<Synchronizer>(
@@ -36,21 +36,25 @@ StereoFusionNode::StereoFusionNode()
 
 void StereoFusionNode::leftInfoCallback(
     const sensor_msgs::msg::CameraInfo::SharedPtr msg)
-{
-    left_cam_model_.fromCameraInfo(msg);
-    left_info_received_ = true;
+{   
+    if(!left_info_received_){
+        left_cam_model_.fromCameraInfo(msg);
+        left_info_received_ = true;
+    }
 }
 
 void StereoFusionNode::rightInfoCallback(
     const sensor_msgs::msg::CameraInfo::SharedPtr msg)
-{
-    right_cam_model_.fromCameraInfo(msg);
-    right_info_received_ = true;
+{   
+    if(!right_info_received_){
+        right_cam_model_.fromCameraInfo(msg);
+        right_info_received_ = true;
+    }
 }
 
 void StereoFusionNode::stereoCallback(
-    const sensor_msgs::msg::Image::ConstSharedPtr &left_msg,
-    const sensor_msgs::msg::Image::ConstSharedPtr &right_msg)
+    const sensor_msgs::msg::CompressedImage::ConstSharedPtr &left_msg,
+    const sensor_msgs::msg::CompressedImage::ConstSharedPtr &right_msg)
 {
     if (!left_info_received_ || !right_info_received_)
     {
@@ -158,22 +162,22 @@ void StereoFusionNode::stereoCallback(
 }
 
 bool StereoFusionNode::rectifyStereoPair(
-    const sensor_msgs::msg::Image::ConstSharedPtr &left_msg,
-    const sensor_msgs::msg::Image::ConstSharedPtr &right_msg,
+    const sensor_msgs::msg::CompressedImage::ConstSharedPtr &left_msg,
+    const sensor_msgs::msg::CompressedImage::ConstSharedPtr &right_msg,
     cv::Mat &left_rectified,
     cv::Mat &right_rectified)
 {
-    cv_bridge::CvImageConstPtr left_cv;
-    cv_bridge::CvImageConstPtr right_cv;
+    cv_bridge::CvImagePtr left_cv;
+    cv_bridge::CvImagePtr right_cv;
 
     try
     {
-        left_cv = cv_bridge::toCvShare(left_msg, "bgr8");
-        right_cv = cv_bridge::toCvShare(right_msg, "bgr8");
+        left_cv  = cv_bridge::toCvCopy(left_msg, "bgr8");
+        right_cv = cv_bridge::toCvCopy(right_msg, "bgr8");
     }
     catch (const cv_bridge::Exception &e)
     {
-        RCLCPP_ERROR(get_logger(), "another cv_bridge error: %s", e.what());
+        RCLCPP_ERROR(get_logger(), "cv_bridge decode error: %s", e.what());
         return false;
     }
 
@@ -182,6 +186,7 @@ bool StereoFusionNode::rectifyStereoPair(
 
     return true;
 }
+
 
 bool StereoFusionNode::computeDisparitySGBM(
     const cv::Mat &left_rect,

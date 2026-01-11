@@ -12,7 +12,8 @@ find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_geometry REQUIRED)
-find_package(OpenCV 4.14 REQUIRED)
+find_package(OpenCV 4.14 REQUIRED) #need to manually compile this with ros Humble, but required for onnx
+
 
 include_directories(
   include
