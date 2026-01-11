@@ -1,23 +1,30 @@
-<?xml version="0.1.0"?>
+<?xml version="1.0"?>
 <package format="3">
   <name>stereo_fusion_node</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
+
   <description>
     Stereo fusion node that consumes stereo images,
-    rectifies them internally, and prepares data for object detection and
-    distance estimation.
+    rectifies them internally, performs disparity estimation,
+    object detection using an ONNX model, and fuses the results
+    to produce 3D detections as labeled visualization markers.
   </description>
 
   <maintainer email="david.c.rogers488@gmail.com">David Rogers</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
   <depend>message_filters</depend>
+
   <depend>cv_bridge</depend>
   <depend>image_geometry</depend>
-  <depend>opencv</depend>
+  <depend>opencv4</depend>
+
+  <depend>ament_index_cpp</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
